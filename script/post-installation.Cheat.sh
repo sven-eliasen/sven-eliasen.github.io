@@ -168,7 +168,7 @@ mkdir -p /root/.config/cheat && cheat --init > /root/.config/cheat/conf.yml
 git clone https://github.com/cheat/cheatsheets
 mkdir -vp /root/.config/cheat/cheatsheets/community
 mkdir -vp /root/.config/cheat/cheatsheets/personal
-mv /root/cheatsheets/ /root/.config/cheat/cheatsheets/community
+mv /root/cheatsheets/* /root/.config/cheat/cheatsheets/community
 
 mkdir -vp /opt/COMMUN
 mv -v /root/.config/cheat/ /opt/COMMUN/
