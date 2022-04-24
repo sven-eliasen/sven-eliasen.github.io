@@ -7,7 +7,7 @@
 
 # S'arrète à la moindre erreur
 set -e
-#set -x
+set -x
 
 # Vérifie qu'on est root
 if [ $EUID -ne 0 ]
@@ -188,20 +188,4 @@ done
 mkdir -vp /etc/skel/.config
 ln -s /opt/COMMUN/cheat /etc/skel/.config/cheat
 
-echo "
-editor: vim
-colorize: true
-style: monokai
-formatter: terminal16m
-pager: less -FRX
-cheatpaths:
-  - name: community
-    path: /opt/COMMUN/cheat/cheatsheets/community
-    tags: [ community ]
-    readonly: true
-  - name: personal
-    path: /opt/COMMUN/cheat/cheatsheets/personal
-    tags: [ personal ]
-    readonly: false
-" > /opt/COMMUN/cheat/conf.yml
 echo 'umask 007 -R /opt/COMMUN/' >> /etc/bash.bashrc
