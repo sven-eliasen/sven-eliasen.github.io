@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Nom			: post-installation.Cheat.sh
-# Description	: Création, configuration des users + installation de Cheat pour tout les users
+# Description		: Création, configuration des users + installation de Cheat pour tout les users
 # Auteurs		: Arthur DUPUIS, Joakim PETTERSEN, Léo PEROCHON
 # Version		: 1.0
 
@@ -24,11 +24,11 @@ apt install -y sudo git vim mlocate tree rsync mlocate figlet
 echo "###########################################################"
 echo "# 	Génération automatique des clés SSH du root         #"
 echo "###########################################################"
-mkdir ~/.ssh
-chmod -v 700 ~/.ssh
-ssh-keygen -t ed25519 -f  ~/.ssh/id_ed25519 -q -N ""
+mkdir /root/.ssh
+chmod -v 700 /root/.ssh
+ssh-keygen -t ed25519 -f  /root/.ssh/id_ed25519 -q -N ""
 echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config
-echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9rKzJBdQlBB8Iy9iqoYpyK8Y80vtn+nf6bcbQOR0yk6dsLmrN50qEE5NamR3gMEvqLqJjgxpUTHYTb5D4RSrgLJRJoLyDO+7E0xkac91YmbwDt6ewbNNqOeKkeGLxk5lXwYbvDqgRhApBZ+fWN5nY9q++iT/5a3R6dn4YV5DQ/2/SEp0tENlt0K0XeaqcjQADXPInTR2uDWslzZhto4b44U4hYQwMZuV6VmgyRhBNDUchp+jzQUSd3NXNFlFH+Tadj91ahotek/e78B3d0UK3l0YmVqQhP/OREgATMLS1gXOP8kKN2X/p1pZdhEfCfOBRmngqSf3Z0vpjOZb1sjXl user0" > ~/.ssh/authorized_keys
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9rKzJBdQlBB8Iy9iqoYpyK8Y80vtn+nf6bcbQOR0yk6dsLmrN50qEE5NamR3gMEvqLqJjgxpUTHYTb5D4RSrgLJRJoLyDO+7E0xkac91YmbwDt6ewbNNqOeKkeGLxk5lXwYbvDqgRhApBZ+fWN5nY9q++iT/5a3R6dn4YV5DQ/2/SEp0tENlt0K0XeaqcjQADXPInTR2uDWslzZhto4b44U4hYQwMZuV6VmgyRhBNDUchp+jzQUSd3NXNFlFH+Tadj91ahotek/e78B3d0UK3l0YmVqQhP/OREgATMLS1gXOP8kKN2X/p1pZdhEfCfOBRmngqSf3Z0vpjOZb1sjXl user0" > /root/.ssh/authorized_keys
 
 echo '##################################################'
 echo '#         Configuration des aliases              #'
@@ -150,42 +150,3 @@ usermod -aG sudo esgi
 usermod -aG sudo davy
 usermod -aG commun davy
 usermod -aG commun esgi
-
-# Installation de l'executable
-echo '##################################################'
-echo "#      Instalation de l'executable               #"
-echo '##################################################'
-wget https://github.com/cheat/cheat/releases/download/4.2.3/cheat-linux-amd64.gz
-gunzip cheat-linux-amd64.gz
-chmod +x cheat-linux-amd64
-mv -v cheat-linux-amd64 /usr/local/bin/cheat
-
-# Configuration du Cheat
-echo '##################################################'
-echo '#           Configuration de Cheat               #'
-echo '##################################################'
-mkdir -p /root/.config/cheat && cheat --init > /root/.config/cheat/conf.yml
-git clone https://github.com/cheat/cheatsheets
-mkdir -vp /root/.config/cheat/cheatsheets/community
-mkdir -vp /root/.config/cheat/cheatsheets/personal
-mv /root/cheatsheets/* /root/.config/cheat/cheatsheets/community
-
-mkdir -vp /opt/COMMUN
-mv -v /root/.config/cheat/ /opt/COMMUN/
-chown -R :commun /opt/COMMUN/
-chmod -R 770 /opt/COMMUN/
-ln -s /opt/COMMUN/cheat /root/.config/cheat
-
-for user_home in /home/*;
-do
-	mkdir -vp "$user_home/.config"
-	ln -s /opt/COMMUN/cheat "$user_home/.config/cheat"
-	IFS='/'
-	read -ra ARR <<< $user_home
-	usermod -g commun ${ARR[2]}
-done
-
-mkdir -vp /etc/skel/.config
-ln -s /opt/COMMUN/cheat /etc/skel/.config/cheat
-
-echo 'umask 007 -R /opt/COMMUN/' >> /etc/bash.bashrc
