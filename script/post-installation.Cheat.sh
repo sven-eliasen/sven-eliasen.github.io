@@ -6,8 +6,8 @@
 # Version		: 1.0
 
 # S'arrète à la moindre erreur
-set -e
-set -x
+#set -e
+#set -x
 
 # Vérifie qu'on est root
 if [ $EUID -ne 0 ]
@@ -19,21 +19,21 @@ fi
 echo '##################################################'
 echo '#      Instalation des dependances               #'
 echo '##################################################'
-apt install -y sudo git vim mlocate tree rsync mlocate figlet
+in-target apt install -y sudo git vim mlocate tree rsync mlocate figlet
 
 echo "###########################################################"
 echo "# 	Génération automatique des clés SSH du root         #"
 echo "###########################################################"
-mkdir /root/.ssh
-chmod -v 700 /root/.ssh
-ssh-keygen -t ed25519 -f  /root/.ssh/id_ed25519 -q -N ""
-echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config
-echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9rKzJBdQlBB8Iy9iqoYpyK8Y80vtn+nf6bcbQOR0yk6dsLmrN50qEE5NamR3gMEvqLqJjgxpUTHYTb5D4RSrgLJRJoLyDO+7E0xkac91YmbwDt6ewbNNqOeKkeGLxk5lXwYbvDqgRhApBZ+fWN5nY9q++iT/5a3R6dn4YV5DQ/2/SEp0tENlt0K0XeaqcjQADXPInTR2uDWslzZhto4b44U4hYQwMZuV6VmgyRhBNDUchp+jzQUSd3NXNFlFH+Tadj91ahotek/e78B3d0UK3l0YmVqQhP/OREgATMLS1gXOP8kKN2X/p1pZdhEfCfOBRmngqSf3Z0vpjOZb1sjXl user0" > /root/.ssh/authorized_keys
+mkdir /target/root/.ssh
+chmod -v 700 /target/root/.ssh
+ssh-keygen -t ed25519 -f  /target/root/.ssh/id_ed25519 -q -N ""
+echo "PermitRootLogin prohibit-password" >> /target/etc/ssh/sshd_config
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9rKzJBdQlBB8Iy9iqoYpyK8Y80vtn+nf6bcbQOR0yk6dsLmrN50qEE5NamR3gMEvqLqJjgxpUTHYTb5D4RSrgLJRJoLyDO+7E0xkac91YmbwDt6ewbNNqOeKkeGLxk5lXwYbvDqgRhApBZ+fWN5nY9q++iT/5a3R6dn4YV5DQ/2/SEp0tENlt0K0XeaqcjQADXPInTR2uDWslzZhto4b44U4hYQwMZuV6VmgyRhBNDUchp+jzQUSd3NXNFlFH+Tadj91ahotek/e78B3d0UK3l0YmVqQhP/OREgATMLS1gXOP8kKN2X/p1pZdhEfCfOBRmngqSf3Z0vpjOZb1sjXl user0" > /target/root/.ssh/authorized_keys
 
 echo '##################################################'
 echo '#         Configuration des aliases              #'
 echo '##################################################'
-cat > /etc/bash.bashrc << EOF
+cat > /target/etc/bash.bashrc << EOF
 export LS_OPTIONS='--color=auto'
 eval "$(dircolors)"
 alias ls='ls $LS_OPTIONS'
@@ -64,8 +64,8 @@ alias c='clear'
 
 HISTSIZE=50000
 EOF
-echo "PS1='\n[\t] \u \h \w \n\$ '" >> /etc/skel/.bashrc
-for user_home in /home/*;
+echo "PS1='\n[\t] \u \h \w \n\$ '" >> /target/etc/skel/.bashrc
+for user_home in /target/home/*;
 do
 	echo "PS1='\n[\t] \u \h \w \n\$ '" >> "$user_home/.bashrc"
 done
@@ -82,15 +82,15 @@ BLUE="\033[34m"
 CYAN="\033[36m"
 LIGHT_GREEN="\033[1;32m"
 LIGHT_RED="\033[1;31m"
-' > /etc/update-motd.d/colors
+' > /target/etc/update-motd.d/colors
 echo '#!/bin/sh
 . /etc/update-motd.d/colors
 printf "\n"$LIGHT_RED
 figlet " "$(hostname -s)
 printf $NONE
 printf "\n"
-' > /etc/update-motd.d/00-hostname
-chmod 755 /etc/update-motd.d/00-hostname
+' > /target/etc/update-motd.d/00-hostname
+chmod 755 /target/etc/update-motd.d/00-hostname
 echo '#!/bin/bash
 #author art0v1r0s 2022 mars
 
@@ -112,8 +112,8 @@ echo -e "  "$DISTRIB_DESCRIPTION "(kernel "$(uname -r)")\n"
 
 # Update the information for next time
 printf "DISTRIB_DESCRIPTION=\"%s\"" "$(lsb_release -s -d)" > /etc/update-motd.d/lsb-release &
-' > /etc/update-motd.d/10-banner
-chmod 755 /etc/update-motd.d/10-banner
+' > /target/etc/update-motd.d/10-banner
+chmod 755 /target/etc/update-motd.d/10-banner
 echo '#!/bin/bash
 proc=`cat /proc/cpuinfo | grep -i "^model name" | awk -F": " "{print $2}"`
 memfree=`cat /proc/meminfo | grep MemFree | awk {"print $2"}`
@@ -135,10 +135,10 @@ printf "\n"
 printf "  Uptime : $uptime"
 printf "\n"
 printf "\n"
-' > /etc/update-motd.d/20-syinfo
-chmod 755 /etc/update-motd.d/20-syinfo
-rm /etc/motd
-ln -s /var/run/motd /etc/motd
+' > /target/etc/update-motd.d/20-syinfo
+chmod 755 /target/etc/update-motd.d/20-syinfo
+rm /target/etc/motd
+ln -s /target/var/run/motd /target/etc/motd
 
 echo '##################################################'
 echo '#         Gestion des users & groupes            #'
